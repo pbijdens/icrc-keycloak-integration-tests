@@ -1,0 +1,7 @@
+.vs/
+node_modules/
+cypress/screenshots/
+cypress/downloads/
+results/
+testResults/
+package-lock.json

@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "cypress:open": "cypress open",
+    "docker:install-keycloak": "docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin  quay.io/keycloak/keycloak:22.0.1 start-dev"
+  },
+  "devDependencies": {
+    "axios": "^1.6.5",
+    "cypress": "^13.6.3",
+    "typescript": "^5.3.3"
+  }
+}

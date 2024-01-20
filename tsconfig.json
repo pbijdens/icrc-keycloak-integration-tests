@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"lib": [ "es2016", "dom" ],
+		"types": [ "cypress", "node" ],
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"moduleResolution": "node"
+	},
+	"typeRoots": [ "./global.d.ts" ],
+	"include": [ "**/*.ts" ],
+	"ts-node": {
+		"esm": true,
+		"experimentalSpecifierResolution": "node"
+	}
+}
