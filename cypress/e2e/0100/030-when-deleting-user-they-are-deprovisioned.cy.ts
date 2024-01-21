@@ -3,16 +3,20 @@ import { KeycloakDefaultPassword } from '../../setup-keycloak';
 
 describe('0002-030', () => {
     before(() => {
-        cy.createSettingsInGlobalThis().then(() => {
+        cy.createSettingsInGlobalThis();
+        cy.initializeGlobalThisFromKeycloak().then(() => {
             globalThis.keycloakUser0002030 = <KeycloakUserInfo>{
-                username: "user0002030",
-                email: "user0002030@example.com",
-                firstName: "user0002030",
-                lastName: "user0002030",
+                username: "0002-030",
+                email: "0002-030@example.com",
+                firstName: "0002-030",
+                lastName: "0002-030",
                 groups: [globalThis.keycloakGroupA.groupname],
                 password: KeycloakDefaultPassword
             };
         });
+    });
+
+    after(() => {
     });
 
     beforeEach(() => {
@@ -27,6 +31,7 @@ describe('0002-030', () => {
     it('Force provisioning by logging in interactively on the target system', () => {
         cy.targetStartInteractiveLogin();
         cy.keycloakPerformInteractiveLogin(globalThis.keycloakUser0002030);
+        cy.targetValidateUserIsLoggedOn(globalThis.keycloakUser0002030);
         cy.targetLogOff();
     });
 
@@ -38,5 +43,5 @@ describe('0002-030', () => {
         cy.targetEnsureUserIsDeprovisioned(globalThis.keycloakUser0002030);
     });
 
-    // we're not testing keycloak so we will not test the the user cna't log in
+    // we're not testing keycloak so we will not test the the user can't log in
 });

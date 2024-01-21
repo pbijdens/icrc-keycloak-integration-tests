@@ -21,11 +21,15 @@ declare global {
             keycloakRemoveUserFromGroup(group: KeycloakGroupInfo, user: KeycloakUserInfo);
             keycloakCheckIfUserIsInGroup(group: KeycloakGroupInfo, user: KeycloakUserInfo);
             keycloakCheckIfUserIsNotInGroup(group: KeycloakGroupInfo, user: KeycloakUserInfo);
-            keycloakPerformInteractiveLogin(user: KeycloakUserInfo);            
+            keycloakPerformInteractiveLogin(user: KeycloakUserInfo);
+            keycloakValidateLoginFailed(user: KeycloakUserInfo);
+            keycloakGetGroups(processData: (groups: any[]) => void);
+            keycloakGetUsers(processData: (users: any[]) => void);            
 
             // Targets that must be implemented to allow running all tests
             targetConfigure();
             targetStartInteractiveLogin();
+            targetValidateUserIsLoggedOn(user: KeycloakUserInfo);
             targetLogOff();
             targetEnsureUserIsProvisioned(user: KeycloakUserInfo);
             targetEnsureUserIsDeprovisioned(user: KeycloakUserInfo);
@@ -35,7 +39,9 @@ declare global {
             targetValidateUserHasGroupBRightsOnly(user: KeycloakUserInfo);
             targetValidateUserHasGroupABRights(user: KeycloakUserInfo);
 
+            // Locally defined
             createSettingsInGlobalThis();
+            initializeGlobalThisFromKeycloak();
         }
     }
 

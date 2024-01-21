@@ -40,6 +40,10 @@ Cypress.Commands.add("createSettingsInGlobalThis", () => {
     globalThis.keycloakGroupB = <KeycloakGroupInfo>{
         groupname: "group-b"
     };
+    globalThis.keycloakGroupC = <KeycloakGroupInfo>{
+        groupname: "group-c"
+    };
+
     globalThis.keycloakUser1 = <KeycloakUserInfo>{
         email: "user1@example.com",
         firstName: "Abc",
@@ -56,5 +60,24 @@ Cypress.Commands.add("createSettingsInGlobalThis", () => {
         password: KeycloakDefaultPassword,
         username: "user2"
     };
+});
+
+Cypress.Commands.add("initializeGlobalThisFromKeycloak", () => {
+    let localGroups = [globalThis.keycloakGroupA, globalThis.keycloakGroupB, globalThis.keycloakGroupC];
+    // Make sure the IDs are known for all "fixed" groups
+    cy.keycloakGetGroups((groups) => {
+        (groups || []).forEach(x => {
+            const g = localGroups.find(g => g.groupname === x.name);
+            if (g) { g.id = x.id; }
+        });
+    });
+
+    let localUsers = [globalThis.keycloakUser1, globalThis.keycloakUser2];
+    cy.keycloakGetUsers((users) => {
+        (users || []).forEach(x => {
+            const g = localUsers.find(g => g.username === x.username);
+            if (g) { g.id = x.id; }
+        });
+    });
 });
 

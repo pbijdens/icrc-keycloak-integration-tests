@@ -3,7 +3,7 @@ import * as settings from '../../../test-settings.json';
 describe('0001-001',  () => {
     before(() => {     
         cy.createSettingsInGlobalThis();
-    });
+    });    
 
     beforeEach(() => {
     });

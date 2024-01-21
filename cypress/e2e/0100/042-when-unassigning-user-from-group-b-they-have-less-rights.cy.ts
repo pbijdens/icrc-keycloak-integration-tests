@@ -3,16 +3,21 @@ import { KeycloakDefaultPassword } from '../../setup-keycloak';
 
 describe('0002-042',  () => {
     before(() => {
-        cy.createSettingsInGlobalThis().then(() => {
+        cy.createSettingsInGlobalThis();
+        cy.initializeGlobalThisFromKeycloak().then(() => {
             globalThis.keycloakUser0002042 = <KeycloakUserInfo>{
-                username: "user0002042",
-                email: "user0002042@example.com",
-                firstName: "user0002042",
-                lastName: "user0002042",
+                username: "0002-042",
+                email: "0002-042@example.com",
+                firstName: "0002-042",
+                lastName: "0002-042",
                 groups: [globalThis.keycloakGroupA.groupname,globalThis.keycloakGroupB.groupname],
                 password: KeycloakDefaultPassword
             };
         });
+    });
+
+    after(() => {
+        cy.keycloakDeleteUser(globalThis.keycloakUser0002042);
     });
 
     beforeEach(() => {
@@ -41,6 +46,7 @@ describe('0002-042',  () => {
         cy.keycloakRemoveUserFromGroup(globalThis.keycloakGroupB, globalThis.keycloakUser0002042)
         cy.targetStartInteractiveLogin();
         cy.keycloakPerformInteractiveLogin(globalThis.keycloakUser0002042);        
+        cy.targetValidateUserIsLoggedOn(globalThis.keycloakUser0002020);
     });
 
     it('Validate user has no rights they should not have when not in group b, and all in group a', () => {

@@ -3,16 +3,21 @@ import { KeycloakDefaultPassword } from '../../setup-keycloak';
 
 describe('0002-011',  () => {
     before(() => {     
-        cy.createSettingsInGlobalThis().then(() => {
+        cy.createSettingsInGlobalThis();
+        cy.initializeGlobalThisFromKeycloak().then(() => {
             globalThis.keycloakUser0002010B = <KeycloakUserInfo>{
-                username: "user0002011B",
-                email: "user0002011B@example.com",
-                firstName: "0002011B",
-                lastName: "0002011B",
+                username: "0002-011",
+                email: "0002-011@example.com",
+                firstName: "0002-011",
+                lastName: "0002-011",
                 groups: [globalThis.keycloakGroupA.groupname],
                 password: KeycloakDefaultPassword
             };
         });
+    });
+
+    after(() => {
+        cy.keycloakDeleteUser(globalThis.keycloakUser0002010B);
     });
 
     beforeEach(() => {
@@ -30,6 +35,7 @@ describe('0002-011',  () => {
     it('Validate the user can interactively log in on the target system', () => {
         cy.targetStartInteractiveLogin();
         cy.keycloakPerformInteractiveLogin(globalThis.keycloakUser0002010B);           
+        cy.targetValidateUserIsLoggedOn(globalThis.keycloakUser0002010B);
     });
 
     it('Validate the user is provisioned in the target system properly', () => {
