@@ -46,7 +46,7 @@ describe('0002-042',  () => {
         cy.keycloakRemoveUserFromGroup(globalThis.keycloakGroupB, globalThis.keycloakUser0002042)
         cy.targetStartInteractiveLogin();
         cy.keycloakPerformInteractiveLogin(globalThis.keycloakUser0002042);        
-        cy.targetValidateUserIsLoggedOn(globalThis.keycloakUser0002020);
+        cy.targetValidateUserIsLoggedOn(globalThis.keycloakUser0002042);
     });
 
     it('Validate user has no rights they should not have when not in group b, and all in group a', () => {

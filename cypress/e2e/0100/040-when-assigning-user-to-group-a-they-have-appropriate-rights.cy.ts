@@ -35,7 +35,7 @@ describe('0002-040',  () => {
     it('Validate the user can interactively log in on the target system', () => {
         cy.targetStartInteractiveLogin();
         cy.keycloakPerformInteractiveLogin(globalThis.keycloakUser0002040);
-        cy.targetValidateUserIsLoggedOn(globalThis.keycloakUser0002020);
+        cy.targetValidateUserIsLoggedOn(globalThis.keycloakUser0002040);
     });
 
     it('Validate user only has group a rights', () => {

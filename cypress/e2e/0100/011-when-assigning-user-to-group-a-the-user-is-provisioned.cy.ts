@@ -13,20 +13,15 @@ describe('0002-011',  () => {
                 groups: [globalThis.keycloakGroupA.groupname],
                 password: KeycloakDefaultPassword
             };
+            cy.keycloakDeleteUser(globalThis.keycloakUser0002010B);
         });
     });
 
     after(() => {
-        cy.keycloakDeleteUser(globalThis.keycloakUser0002010B);
     });
 
     beforeEach(() => {
-    });
-
-    it('Validate test user is not assigned to target group', () => {
-        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002010B, globalThis.keycloakGroupA);
-        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002010B, globalThis.keycloakGroupB);
-    });
+    });    
 
     it('Create a user and assign it to the target group', () => {
         cy.keycloakCreateUser(globalThis.keycloakUser0002010B);

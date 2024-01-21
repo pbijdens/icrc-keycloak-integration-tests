@@ -121,6 +121,7 @@ Cypress.Commands.add('keycloakCreateUser', (user: KeycloakUserInfo) => {
 
 Cypress.Commands.add('keycloakDeleteUser', (user: KeycloakUserInfo) => {
      // DELETE /admin/realms/{realm}/users/{id} @ https://www.keycloak.org/docs-api/22.0.1/rest-api/index.html#_users
+     cy.keycloakMakeSureUserIDIsPopulated(user);
      cy.chainPrime([
           KeycloakLoginStep,
           {
@@ -162,7 +163,7 @@ Cypress.Commands.add('keycloakCreateGroup', (group: KeycloakGroupInfo) => {
 
 Cypress.Commands.add('keycloakDeleteGroup', (group: KeycloakGroupInfo) => {
      // DELETE /admin/realms/{realm}/groups/{id}
-
+     cy.keycloakMakeSureGroupIDIsPopulated(group);
      cy.chainPrime([
           KeycloakLoginStep,
           {
@@ -181,6 +182,8 @@ Cypress.Commands.add('keycloakDeleteGroup', (group: KeycloakGroupInfo) => {
 
 Cypress.Commands.add('keycloakAssignUserToGroup', (group: KeycloakGroupInfo, user: KeycloakUserInfo) => {
      // PUT /admin/realms/${KeycloakRealm.realm}/users/{userid}/groups/{groupid}
+     cy.keycloakMakeSureUserIDIsPopulated(user);
+     cy.keycloakMakeSureGroupIDIsPopulated(group);
      cy.chainPrime([
           KeycloakLoginStep,
           {
@@ -199,6 +202,8 @@ Cypress.Commands.add('keycloakAssignUserToGroup', (group: KeycloakGroupInfo, use
 
 Cypress.Commands.add('keycloakRemoveUserFromGroup', (group: KeycloakGroupInfo, user: KeycloakUserInfo) => {
      // DELETE /admin/realms/${KeycloakRealm.realm}/users/{userid}/groups/{groupid}
+     cy.keycloakMakeSureUserIDIsPopulated(user);
+     cy.keycloakMakeSureGroupIDIsPopulated(group);
      cy.chainPrime([
           KeycloakLoginStep,
           {
@@ -217,6 +222,8 @@ Cypress.Commands.add('keycloakRemoveUserFromGroup', (group: KeycloakGroupInfo, u
 
 Cypress.Commands.add('keycloakCheckIfUserIsInGroup', (group: KeycloakGroupInfo, user: KeycloakUserInfo) => {
      // GET /admin/realms/{realm}/users/{userid}/groups
+     cy.keycloakMakeSureUserIDIsPopulated(user);
+     cy.keycloakMakeSureGroupIDIsPopulated(group);
      cy.chainPrime([
           KeycloakLoginStep,
           {
@@ -225,9 +232,8 @@ Cypress.Commands.add('keycloakCheckIfUserIsInGroup', (group: KeycloakGroupInfo, 
                data: () => {
                },
                onResponse: (response) => {
-                    cy.log(`${response.body}`, response.body);
                     const found = (response.body || []).find(x => x.id === group.id);
-                    expect(response.isOkStatusCode, `${user.username}: ${response.isOkStatusCode}`).to.eq(true);
+                    expect(response.isOkStatusCode || response.status == 404, `${user.username}: ${response.isOkStatusCode}`).to.eq(true);
                     expect(found && true, `Expected that ${group.groupname} was in ${user.username}'s groups`).to.be.true;
                },
                form: false,
@@ -238,6 +244,8 @@ Cypress.Commands.add('keycloakCheckIfUserIsInGroup', (group: KeycloakGroupInfo, 
 
 Cypress.Commands.add('keycloakCheckIfUserIsNotInGroup', (group: KeycloakGroupInfo, user: KeycloakUserInfo) => {
      // GET /admin/realms/{realm}/users/{userid}/groups
+     cy.keycloakMakeSureUserIDIsPopulated(user);
+     cy.keycloakMakeSureGroupIDIsPopulated(group);
      cy.chainPrime([
           KeycloakLoginStep,
           {
@@ -245,10 +253,9 @@ Cypress.Commands.add('keycloakCheckIfUserIsNotInGroup', (group: KeycloakGroupInf
                method: 'GET',
                data: () => {
                },
-               onResponse: (response) => {
-                    cy.log(`${response.body}`, response.body);
-                    const found = (response.body || []).find(x => x.id === group.id);
-                    expect(response.isOkStatusCode, `${user.username}: ${response.isOkStatusCode}`).to.eq(true);
+               onResponse: (response) => {                    
+                    const found = (response.status != 404) && (response.body || []).find(x => x.id === group.id);
+                    expect(response.isOkStatusCode || response.status == 404, `${user.username}: ${response.isOkStatusCode}`).to.eq(true);
                     expect(!(found && true), `Expected that ${group.groupname} was in ${user.username}'s groups`).to.be.true;
                },
                form: false,
@@ -295,7 +302,7 @@ Cypress.Commands.add('keycloakGetUsers', (processData: (users: any[]) => void) =
      ]);
 });
 
-Cypress.Commands.add('keycloakPerformInteractiveLogin', (user: KeycloakUserInfo) => {
+Cypress.Commands.add('keycloakPerformInteractiveLogin', (user: KeycloakUserInfo) => {     
      cy.get('form').within(() => {
           cy.get('input[name="username"]', { timeout: 1000 }).type(user.username);
           cy.get('input[name="password"]', { timeout: 1000 }).type(user.password);
@@ -311,6 +318,22 @@ Cypress.Commands.add('keycloakValidateLoginFailed', (user: KeycloakUserInfo) => 
           cy.get('input[name="password"]', { timeout: 1000 });
           cy.get('input[name="login"]', { timeout: 1000 });
      });
+});
+
+Cypress.Commands.add('keycloakMakeSureUserIDIsPopulated', (user: KeycloakUserInfo) => {
+     if (!user.id) {
+          cy.keycloakGetUsers((users) => {
+               users.forEach(x => { if (x.username === user.username) { user.id = x.id; } });
+          });
+     }
+});
+
+Cypress.Commands.add('keycloakMakeSureGroupIDIsPopulated', (group: KeycloakGroupInfo) => {
+     if (!group.id) {
+          cy.keycloakGetUsers((users) => {
+               users.forEach(x => { if (x.name === group.groupname) { group.id = x.id; } });
+          });
+     }
 });
 
 export class KeycloakCreateUserRepresentation {

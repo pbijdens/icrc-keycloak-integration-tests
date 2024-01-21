@@ -43,5 +43,9 @@ describe('0002-030', () => {
         cy.targetEnsureUserIsDeprovisioned(globalThis.keycloakUser0002030);
     });
 
-    // we're not testing keycloak so we will not test the the user can't log in
+    it('Validate the user can no longer log in interactively', () => {
+        cy.targetStartInteractiveLogin();
+        cy.keycloakPerformInteractiveLogin(globalThis.keycloakUser0002030);
+        cy.keycloakValidateLoginFailed(globalThis.keycloakUser0002030);
+    });
 });

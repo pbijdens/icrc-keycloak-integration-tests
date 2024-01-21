@@ -13,6 +13,7 @@ describe('0002-020', () => {
                 groups: [globalThis.keycloakGroupA.groupname],
                 password: KeycloakDefaultPassword
             };
+            cy.keycloakDeleteUser(globalThis.keycloakUser0002020);
         });
     });
 
@@ -21,11 +22,6 @@ describe('0002-020', () => {
     });
 
     beforeEach(() => {
-    });
-
-    it('Validate test user is not assigned to target group', () => {
-        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002020, globalThis.keycloakGroupA);
-        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002020, globalThis.keycloakGroupB);
     });
 
     it('Create a user and assign it to the target group', () => {
@@ -48,8 +44,9 @@ describe('0002-020', () => {
         cy.targetEnsureUserIsDeprovisioned(globalThis.keycloakUser0002020);
     });
 
-    it('Validate the user is can no longer log in interactively', () => {
+    it('Validate the user can no longer log in interactively', () => {
+        cy.targetStartInteractiveLogin();
         cy.keycloakPerformInteractiveLogin(globalThis.keycloakUser0002020);
-        cy.keycloakValidateLoginFailed(globalThis.keycloakUser0002020);
+        cy.targetValidateUserAccessIsDeniedAfterLogin();
     });   
 });

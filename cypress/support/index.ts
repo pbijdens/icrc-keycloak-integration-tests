@@ -25,6 +25,8 @@ declare global {
             keycloakValidateLoginFailed(user: KeycloakUserInfo);
             keycloakGetGroups(processData: (groups: any[]) => void);
             keycloakGetUsers(processData: (users: any[]) => void);            
+            keycloakMakeSureUserIDIsPopulated(user: KeycloakUserInfo);
+            keycloakMakeSureGroupIDIsPopulated(group: KeycloakGroupInfo);
 
             // Targets that must be implemented to allow running all tests
             targetConfigure();
@@ -38,6 +40,7 @@ declare global {
             targetValidateUserHasGroupARightsOnly(user: KeycloakUserInfo);
             targetValidateUserHasGroupBRightsOnly(user: KeycloakUserInfo);
             targetValidateUserHasGroupABRights(user: KeycloakUserInfo);
+            targetValidateUserAccessIsDeniedAfterLogin();
 
             // Locally defined
             createSettingsInGlobalThis();

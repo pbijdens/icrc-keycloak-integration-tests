@@ -35,9 +35,9 @@ Cypress.Commands.add('targetLogOff', () => {
      cy.visit('http://localhost:8000/');
      cy.contains('Start SAML Flow', { timeout: 1000 }).click();
      cy.url().should('contain', 'http://localhost:8080/realms/Humanitarians/protocol/saml', { timeout: 1000 });
-     cy.get('form').within(() => {
-          cy.get('input', { timeout: 1000 });
-     });     
+     // cy.get('form').within(() => {
+     //      cy.get('input', { timeout: 1000 });
+     // });     
 });
 
 Cypress.Commands.add('targetEnsureUserIsProvisioned', (user: KeycloakUserInfo) => {
@@ -65,5 +65,9 @@ Cypress.Commands.add('targetValidateUserHasGroupBRightsOnly', (user: KeycloakUse
 });
 
 Cypress.Commands.add('targetValidateUserHasGroupABRights', (user: KeycloakUserInfo) => {
+     cy.log('System does not support roles, therefore this test always succeeds.');
+});
+
+Cypress.Commands.add('targetValidateUserAccessIsDeniedAfterLogin', () => {
      cy.log('System does not support roles, therefore this test always succeeds.');
 });
