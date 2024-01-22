@@ -34,12 +34,6 @@ Cypress.Commands.add("chainPrime", (steps: ChainedStep<any>[]) => {
 Cypress.Commands.add("createSettingsInGlobalThis", () => {
     globalThis.settings = settings;
 
-    globalThis.keycloakGroupA = <KeycloakGroupInfo>{
-        groupname: "group-a"
-    };
-    globalThis.keycloakGroupB = <KeycloakGroupInfo>{
-        groupname: "group-b"
-    };
     globalThis.keycloakGroupC = <KeycloakGroupInfo>{
         groupname: "group-c"
     };
@@ -60,10 +54,12 @@ Cypress.Commands.add("createSettingsInGlobalThis", () => {
         password: KeycloakDefaultPassword,
         username: "user2"
     };
+
+    cy.targetAddGroupNamesToGlobalThis();
 });
 
 Cypress.Commands.add("initializeGlobalThisFromKeycloak", () => {
-    let localGroups = [globalThis.keycloakGroupA, globalThis.keycloakGroupB, globalThis.keycloakGroupC];
+    let localGroups = [globalThis.targetKeycloakSecurityGroupA, globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakGroupC];
     // Make sure the IDs are known for all "fixed" groups
     cy.keycloakGetGroups((groups) => {
         (groups || []).forEach(x => {

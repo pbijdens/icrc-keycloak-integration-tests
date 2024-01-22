@@ -10,7 +10,7 @@ describe('0002-041',  () => {
                 email: "0002-041@example.com",
                 firstName: "0002-041",
                 lastName: "0002-041",
-                groups: [globalThis.keycloakGroupB.groupname],
+                groups: [globalThis.targetKeycloakSecurityGroupB.groupname],
                 password: KeycloakDefaultPassword
             };
         });
@@ -24,8 +24,8 @@ describe('0002-041',  () => {
     });
 
     it('Validate test user is not assigned to group a', () => {
-        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002041, globalThis.keycloakGroupA);
-        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002041, globalThis.keycloakGroupB);
+        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002041, globalThis.targetKeycloakSecurityGroupA);
+        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002041, globalThis.targetKeycloakSecurityGroupB);
     });
 
     it('Create a user and assign it to group a', () => {

@@ -10,7 +10,7 @@ describe('0002-042',  () => {
                 email: "0002-042@example.com",
                 firstName: "0002-042",
                 lastName: "0002-042",
-                groups: [globalThis.keycloakGroupA.groupname,globalThis.keycloakGroupB.groupname],
+                groups: [globalThis.targetKeycloakSecurityGroupA.groupname,globalThis.targetKeycloakSecurityGroupB.groupname],
                 password: KeycloakDefaultPassword
             };
         });
@@ -24,8 +24,8 @@ describe('0002-042',  () => {
     });
 
     it('Validate test user is not assigned to group a or group b', () => {
-        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002042, globalThis.keycloakGroupA);
-        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002042, globalThis.keycloakGroupB);
+        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002042, globalThis.targetKeycloakSecurityGroupA);
+        cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakUser0002042, globalThis.targetKeycloakSecurityGroupB);
     });
 
     it('Create a user and assign it to group a and group b', () => {
@@ -43,7 +43,7 @@ describe('0002-042',  () => {
 
     it('Remove the user from group b', () => {
         cy.targetLogOff();
-        cy.keycloakRemoveUserFromGroup(globalThis.keycloakGroupB, globalThis.keycloakUser0002042)
+        cy.keycloakRemoveUserFromGroup(globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakUser0002042)
         cy.targetStartInteractiveLogin();
         cy.keycloakPerformInteractiveLogin(globalThis.keycloakUser0002042);        
         cy.targetValidateUserIsLoggedOn(globalThis.keycloakUser0002042);

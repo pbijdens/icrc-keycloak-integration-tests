@@ -21,8 +21,6 @@ declare global {
             keycloakRemoveUserFromGroup(group: KeycloakGroupInfo, user: KeycloakUserInfo);
             keycloakCheckIfUserIsInGroup(group: KeycloakGroupInfo, user: KeycloakUserInfo);
             keycloakCheckIfUserIsNotInGroup(group: KeycloakGroupInfo, user: KeycloakUserInfo);
-            keycloakPerformInteractiveLogin(user: KeycloakUserInfo);
-            keycloakValidateLoginFailed(user: KeycloakUserInfo);
             keycloakGetGroups(processData: (groups: any[]) => void);
             keycloakGetUsers(processData: (users: any[]) => void);            
             keycloakMakeSureUserIDIsPopulated(user: KeycloakUserInfo);
@@ -41,6 +39,9 @@ declare global {
             targetValidateUserHasGroupBRightsOnly(user: KeycloakUserInfo);
             targetValidateUserHasGroupABRights(user: KeycloakUserInfo);
             targetValidateUserAccessIsDeniedAfterLogin();
+            targetAddGroupNamesToGlobalThis();
+            keycloakPerformInteractiveLogin(user: KeycloakUserInfo);
+            keycloakValidateLoginFailed(user: KeycloakUserInfo);
 
             // Locally defined
             createSettingsInGlobalThis();

@@ -10,7 +10,7 @@ describe('0002-020', () => {
                 email: "0002-020@example.com",
                 firstName: "0002-020",
                 lastName: "0002-020",
-                groups: [globalThis.keycloakGroupA.groupname],
+                groups: [globalThis.targetKeycloakSecurityGroupA.groupname],
                 password: KeycloakDefaultPassword
             };
             cy.keycloakDeleteUser(globalThis.keycloakUser0002020);
@@ -37,7 +37,7 @@ describe('0002-020', () => {
     });
 
     it('Unassign user from the target group', () => {
-        cy.keycloakRemoveUserFromGroup(globalThis.keycloakGroupA, globalThis.keycloakUser0002020)
+        cy.keycloakRemoveUserFromGroup(globalThis.targetKeycloakSecurityGroupA, globalThis.keycloakUser0002020)
     });
 
     it('Validate the user is deprovisioned (and their data is removed or scheduled to be removed)', () => {

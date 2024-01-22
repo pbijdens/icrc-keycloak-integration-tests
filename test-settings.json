@@ -1,6 +1,16 @@
 {
     "keycloak": {
-        "adminui": "http://localhost:8080",
-        "api": "http://localhost:8080"        
+        "ui": "http://localhost:8080",
+        "api": "http://localhost:8080",
+        "credentials": {
+            "client_id": "admin-cli",
+            "username": "admin",
+            "password": "admin",
+            "grant_type": "password"
+       }
+    },
+    "targetSystem": {
+        "ui": "http://localhost:8000",
+        "acs": "http://localhost:8000/acs.php"
     }
 }

@@ -10,7 +10,7 @@ describe('0002-011',  () => {
                 email: "0002-011@example.com",
                 firstName: "0002-011",
                 lastName: "0002-011",
-                groups: [globalThis.keycloakGroupA.groupname],
+                groups: [globalThis.targetKeycloakSecurityGroupA.groupname],
                 password: KeycloakDefaultPassword
             };
             cy.keycloakDeleteUser(globalThis.keycloakUser0002010B);

@@ -11,12 +11,7 @@ export const KeycloakLoginStep = {
      url: () => `${settings.keycloak.api}/realms/master/protocol/openid-connect/token`,
      method: 'POST',
      data: () => {
-          return {
-               "client_id": "admin-cli",
-               "username": 'admin',
-               "password": 'admin',
-               "grant_type": 'password',
-          }
+          return globalThis.settings.keycloak.credentials;
      },
      onResponse: (response) => {
           expect(response.status).to.eq(200);
@@ -26,6 +21,10 @@ export const KeycloakLoginStep = {
      getToken: undefined,
 };
 
+// Performs basic configuration of keycloak. Will install the "Humanitarian" realm if it does not already exist.
+// Will also create two groups. If the targetKeycloakSecurityGroupA and targetKeycloakSecurityGroupB groups
+// do not exist these will be created also. For the rest this just runs some basic tests that should have no
+// lasting effect.
 Cypress.Commands.add('keycloakConfigure', () => {
      cy.log('Setting up KeyCloak');
 
@@ -49,8 +48,8 @@ Cypress.Commands.add('keycloakConfigure', () => {
           }
      ]).then(() => {
           cy.initializeGlobalThisFromKeycloak().then(() => {
-               if (!globalThis.keycloakGroupA.id) cy.keycloakCreateGroup(globalThis.keycloakGroupA);
-               if (!globalThis.keycloakGroupB.id) cy.keycloakCreateGroup(globalThis.keycloakGroupB);
+               if (!globalThis.targetKeycloakSecurityGroupA.id) cy.keycloakCreateGroup(globalThis.targetKeycloakSecurityGroupA);
+               if (!globalThis.targetKeycloakSecurityGroupB.id) cy.keycloakCreateGroup(globalThis.targetKeycloakSecurityGroupB);
                if (!globalThis.keycloakUser1.id) cy.keycloakCreateUser(globalThis.keycloakUser1);
                if (!globalThis.keycloakUser2.id) cy.keycloakCreateUser(globalThis.keycloakUser2);
           }).then(()=>{
@@ -59,23 +58,23 @@ Cypress.Commands.add('keycloakConfigure', () => {
                cy.keycloakCreateGroup(globalThis.keycloakGroupC);
                cy.keycloakDeleteGroup(globalThis.keycloakGroupC);
 
-               cy.keycloakAssignUserToGroup(globalThis.keycloakGroupB, globalThis.keycloakUser1);
-               cy.keycloakAssignUserToGroup(globalThis.keycloakGroupA, globalThis.keycloakUser2);
-               cy.keycloakAssignUserToGroup(globalThis.keycloakGroupB, globalThis.keycloakUser2);
+               cy.keycloakAssignUserToGroup(globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakUser1);
+               cy.keycloakAssignUserToGroup(globalThis.targetKeycloakSecurityGroupA, globalThis.keycloakUser2);
+               cy.keycloakAssignUserToGroup(globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakUser2);
 
-               cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakGroupA, globalThis.keycloakUser1);
-               cy.keycloakCheckIfUserIsInGroup(globalThis.keycloakGroupB, globalThis.keycloakUser1);
-               cy.keycloakCheckIfUserIsInGroup(globalThis.keycloakGroupA, globalThis.keycloakUser2);
-               cy.keycloakCheckIfUserIsInGroup(globalThis.keycloakGroupB, globalThis.keycloakUser2);
+               cy.keycloakCheckIfUserIsNotInGroup(globalThis.targetKeycloakSecurityGroupA, globalThis.keycloakUser1);
+               cy.keycloakCheckIfUserIsInGroup(globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakUser1);
+               cy.keycloakCheckIfUserIsInGroup(globalThis.targetKeycloakSecurityGroupA, globalThis.keycloakUser2);
+               cy.keycloakCheckIfUserIsInGroup(globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakUser2);
 
-               cy.keycloakRemoveUserFromGroup(globalThis.keycloakGroupB, globalThis.keycloakUser1);
-               cy.keycloakRemoveUserFromGroup(globalThis.keycloakGroupA, globalThis.keycloakUser2);
-               cy.keycloakRemoveUserFromGroup(globalThis.keycloakGroupB, globalThis.keycloakUser2);
+               cy.keycloakRemoveUserFromGroup(globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakUser1);
+               cy.keycloakRemoveUserFromGroup(globalThis.targetKeycloakSecurityGroupA, globalThis.keycloakUser2);
+               cy.keycloakRemoveUserFromGroup(globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakUser2);
 
-               cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakGroupA, globalThis.keycloakUser1);
-               cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakGroupB, globalThis.keycloakUser1);
-               cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakGroupA, globalThis.keycloakUser2);
-               cy.keycloakCheckIfUserIsNotInGroup(globalThis.keycloakGroupB, globalThis.keycloakUser2);
+               cy.keycloakCheckIfUserIsNotInGroup(globalThis.targetKeycloakSecurityGroupA, globalThis.keycloakUser1);
+               cy.keycloakCheckIfUserIsNotInGroup(globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakUser1);
+               cy.keycloakCheckIfUserIsNotInGroup(globalThis.targetKeycloakSecurityGroupA, globalThis.keycloakUser2);
+               cy.keycloakCheckIfUserIsNotInGroup(globalThis.targetKeycloakSecurityGroupB, globalThis.keycloakUser2);
 
                cy.keycloakDeleteUser(globalThis.keycloakUser1);
                cy.keycloakDeleteUser(globalThis.keycloakUser2);
@@ -85,6 +84,7 @@ Cypress.Commands.add('keycloakConfigure', () => {
      });
 });
 
+// Uses the REST API to create a new user in keycloak
 Cypress.Commands.add('keycloakCreateUser', (user: KeycloakUserInfo) => {
      // POST /admin/realms/{realm}/users @ https://www.keycloak.org/docs-api/22.0.1/rest-api/index.html#_users
      cy.chainPrime([
@@ -119,6 +119,7 @@ Cypress.Commands.add('keycloakCreateUser', (user: KeycloakUserInfo) => {
      ]);
 });
 
+// Uses the REST API to delete a user from keycloak
 Cypress.Commands.add('keycloakDeleteUser', (user: KeycloakUserInfo) => {
      // DELETE /admin/realms/{realm}/users/{id} @ https://www.keycloak.org/docs-api/22.0.1/rest-api/index.html#_users
      cy.keycloakMakeSureUserIDIsPopulated(user);
@@ -137,6 +138,7 @@ Cypress.Commands.add('keycloakDeleteUser', (user: KeycloakUserInfo) => {
      ]);
 });
 
+// Uses the REST API to create a new security group in keycloak
 Cypress.Commands.add('keycloakCreateGroup', (group: KeycloakGroupInfo) => {
      // POST /admin/realms/{realm}/groups
      cy.chainPrime([
@@ -161,6 +163,7 @@ Cypress.Commands.add('keycloakCreateGroup', (group: KeycloakGroupInfo) => {
 
 });
 
+// Uses the REST API to delete s ecurity group from keycloak
 Cypress.Commands.add('keycloakDeleteGroup', (group: KeycloakGroupInfo) => {
      // DELETE /admin/realms/{realm}/groups/{id}
      cy.keycloakMakeSureGroupIDIsPopulated(group);
@@ -180,6 +183,7 @@ Cypress.Commands.add('keycloakDeleteGroup', (group: KeycloakGroupInfo) => {
      ]);
 });
 
+// Uses the REST API to assign a user to security group in keycloak
 Cypress.Commands.add('keycloakAssignUserToGroup', (group: KeycloakGroupInfo, user: KeycloakUserInfo) => {
      // PUT /admin/realms/${KeycloakRealm.realm}/users/{userid}/groups/{groupid}
      cy.keycloakMakeSureUserIDIsPopulated(user);
@@ -200,6 +204,7 @@ Cypress.Commands.add('keycloakAssignUserToGroup', (group: KeycloakGroupInfo, use
      ]);
 });
 
+// Uses the REST API to unassign a user from a security group in keycloak
 Cypress.Commands.add('keycloakRemoveUserFromGroup', (group: KeycloakGroupInfo, user: KeycloakUserInfo) => {
      // DELETE /admin/realms/${KeycloakRealm.realm}/users/{userid}/groups/{groupid}
      cy.keycloakMakeSureUserIDIsPopulated(user);
@@ -220,6 +225,7 @@ Cypress.Commands.add('keycloakRemoveUserFromGroup', (group: KeycloakGroupInfo, u
      ]);
 });
 
+// Uses the REST API to validate that a user is in a security group
 Cypress.Commands.add('keycloakCheckIfUserIsInGroup', (group: KeycloakGroupInfo, user: KeycloakUserInfo) => {
      // GET /admin/realms/{realm}/users/{userid}/groups
      cy.keycloakMakeSureUserIDIsPopulated(user);
@@ -242,6 +248,7 @@ Cypress.Commands.add('keycloakCheckIfUserIsInGroup', (group: KeycloakGroupInfo, 
      ]);
 });
 
+// Uses the REST API to validate that a user is not in a security group
 Cypress.Commands.add('keycloakCheckIfUserIsNotInGroup', (group: KeycloakGroupInfo, user: KeycloakUserInfo) => {
      // GET /admin/realms/{realm}/users/{userid}/groups
      cy.keycloakMakeSureUserIDIsPopulated(user);
@@ -264,6 +271,7 @@ Cypress.Commands.add('keycloakCheckIfUserIsNotInGroup', (group: KeycloakGroupInf
      ]);
 });
 
+// Fetches all the security groups for the keycloakinstance
 Cypress.Commands.add('keycloakGetGroups', (processData: (groups: any[]) => void) => {
      // GET /admin/realms/{realm}/groups
      cy.chainPrime([
@@ -283,6 +291,7 @@ Cypress.Commands.add('keycloakGetGroups', (processData: (groups: any[]) => void)
      ]);
 });
 
+// Fetches all the users for the keycloakinstance
 Cypress.Commands.add('keycloakGetUsers', (processData: (users: any[]) => void) => {
      // GET /admin/realms/{realm}/users
      cy.chainPrime([
@@ -302,24 +311,7 @@ Cypress.Commands.add('keycloakGetUsers', (processData: (users: any[]) => void) =
      ]);
 });
 
-Cypress.Commands.add('keycloakPerformInteractiveLogin', (user: KeycloakUserInfo) => {     
-     cy.get('form').within(() => {
-          cy.get('input[name="username"]', { timeout: 1000 }).type(user.username);
-          cy.get('input[name="password"]', { timeout: 1000 }).type(user.password);
-          cy.get('input[name="login"]', { timeout: 1000 }).click();
-     });
-});
-
-Cypress.Commands.add('keycloakValidateLoginFailed', (user: KeycloakUserInfo) => {
-     cy.get('form').within(() => {
-          // Make sure we're still on the login screen
-          cy.get('span[id="input-error"]', { timeout: 1000 });
-          cy.get('input[name="username"]', { timeout: 1000 });
-          cy.get('input[name="password"]', { timeout: 1000 });
-          cy.get('input[name="login"]', { timeout: 1000 });
-     });
-});
-
+// Given a user, looks that user up by username and then adds the ID if it's missing
 Cypress.Commands.add('keycloakMakeSureUserIDIsPopulated', (user: KeycloakUserInfo) => {
      if (!user.id) {
           cy.keycloakGetUsers((users) => {
@@ -328,6 +320,7 @@ Cypress.Commands.add('keycloakMakeSureUserIDIsPopulated', (user: KeycloakUserInf
      }
 });
 
+// Given a user, looks that group up by name and then adds the ID if it's missing
 Cypress.Commands.add('keycloakMakeSureGroupIDIsPopulated', (group: KeycloakGroupInfo) => {
      if (!group.id) {
           cy.keycloakGetUsers((users) => {
